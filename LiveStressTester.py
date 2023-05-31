@@ -1,6 +1,7 @@
 import cv2 as cv
 import numpy as np
-import PEGaussian as uut
+import time
+import processing_tests.PEContour as uut
 
 NUM_COLS = 7
 NUM_ROWS = 6
@@ -15,11 +16,11 @@ axis = np.float32([[3,0,0], [0,3,0], [0,0,-3]]).reshape(-1,3)
 
 def draw(img, corners, imgpts):
     corner = tuple(map(int, corners[0].ravel()))
-    print('\ncorner: ', corner)
 
-    print('point 2: ', tuple(map(int, imgpts[0].ravel())))
-    print('point 2: ', tuple(map(int, imgpts[1].ravel())))
-    print('point 2: ', tuple(map(int, imgpts[2].ravel())))
+    #print('\ncorner: ', corner)
+    #print('point 2: ', tuple(map(int, imgpts[0].ravel())))
+    #print('point 2: ', tuple(map(int, imgpts[1].ravel())))
+    #print('point 2: ', tuple(map(int, imgpts[2].ravel())))
 
     img = cv.line(img, corner, tuple(map(int, imgpts[0].ravel())), (255, 0, 0), 5)
     img = cv.line(img, corner, tuple(map(int, imgpts[1].ravel())), (0, 255, 0), 5)
@@ -30,14 +31,17 @@ vid = cv.VideoCapture(0)
 
 current_frame = 0
 frames_identified = 0
+start = time.time()
 while True:
     ret, img = vid.read()    
     if not ret:
         break
 
     chessfound = False
-    frame = uut.process_frame(img)
-    chessfound, corners = cv.findChessboardCorners(frame, (7,6), None)
+    try_find_chess, frame = uut.process_frame(img)
+    
+    if try_find_chess:
+        chessfound, corners = cv.findChessboardCorners(frame, (7,6), None)
 
     if chessfound:
         frames_identified += 1
@@ -58,7 +62,10 @@ while True:
     if k == 27:
         break
 
+total_time = time.time() - start
 print(f'SUMMARY: {frames_identified} out of {current_frame} frames correctly identified ({frames_identified/current_frame*100:.2f}%)')
+print(f'\tTOTAL TIME:\t{total_time:.4f} seconds')
+print(f'\tAVG FRAMERATE:\t{current_frame/total_time:.2f} fps')
 
 vid.release()
 cv.destroyAllWindows()
