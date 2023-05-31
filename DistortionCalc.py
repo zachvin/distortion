@@ -1,5 +1,6 @@
 import cv2 as cv
 import numpy as np
+import json
 import glob
 
 # termination criteria
@@ -13,7 +14,7 @@ objp[:,:2] = np.mgrid[0:7,0:6].T.reshape(-1,2)
 objpoints = []
 imgpoints = []
 
-images = glob.glob('./calib/*.jpg')
+images = glob.glob('../opencvtest/calib/*.jpg')
 good_images = []
 
 for fname in images:
@@ -46,7 +47,7 @@ cv.destroyAllWindows()
 ret, mtx, dist, rvecs, tvecs = cv.calibrateCamera(objpoints, imgpoints, gray.shape[::-1], None, None)
 
 # undistort
-fname = './calib/testdistort.jpg'
+fname = '../opencvtest/calib/calibresult.jpg'
 img = cv.imread(fname)
 h,w = img.shape[:2]
 newcameramtx, roi = cv.getOptimalNewCameraMatrix(mtx, dist, (w,h), 1, (w,h))
@@ -60,6 +61,10 @@ cv.imwrite('./calib/calibresult.jpg', dst)
 
 cv.imshow('Original', img)
 cv.imshow('Undistorted', dst)
+
+# with open('distortionparams.txt', 'w') as f:
+np.savez('distortionparams', mtx=mtx, dist=dist, rvecs=rvecs, tvecs=tvecs)
+
 
 while True:
     k = cv.waitKey(500)
