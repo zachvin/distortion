@@ -8,4 +8,4 @@ def process_frame(img):
     kernel = np.ones((3, 3), np.uint8)
     gray = cv.erode(gray, kernel, iterations=1)
 
-    return gray
+    return True, gray

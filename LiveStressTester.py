@@ -1,10 +1,10 @@
 import cv2 as cv
 import numpy as np
 import time
-import processing_tests.PEContour as uut
+import processing_tests.PEGray as uut
 
-NUM_COLS = 7
-NUM_ROWS = 6
+NUM_COLS = 3
+NUM_ROWS = 3
 
 with np.load('distortionparams.npz') as f:
     mtx, dist, _, _ = [f[i] for i in ('mtx', 'dist', 'rvecs', 'tvecs')]
@@ -41,7 +41,7 @@ while True:
     try_find_chess, frame = uut.process_frame(img)
     
     if try_find_chess:
-        chessfound, corners = cv.findChessboardCorners(frame, (7,6), None)
+        chessfound, corners = cv.findChessboardCorners(frame, (NUM_COLS, NUM_ROWS), None)
 
     if chessfound:
         frames_identified += 1
