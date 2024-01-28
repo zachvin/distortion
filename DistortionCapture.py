@@ -35,3 +35,4 @@ while True:
 
 
 cv.destroyAllWindows()
+cap.close()
